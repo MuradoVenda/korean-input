@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한글 입력기 (오프라인 완성형)</title>
+
+<style>
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  background: #f5f6f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+.app {
+  background: white;
+  width: 360px;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+h2 {
+  margin: 0 0 8px;
+  text-align: center;
+}
+textarea {
+  width: 100%;
+  height: 160px;
+  font-size: 18px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: none;
+  background: #4f46e5;
+  color: white;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <h2>한글 입력기</h2>
+  <textarea id="t" placeholder="영문으로 입력 (dkssud)"></textarea>
+  <button onclick="copy()">복사하기</button>
+</div>
+
+<!-- Hangul.js 로컬 파일 -->
+<script src="hangul.js"></script>
+
+<script>
+const t = document.getElementById("t");
+let buffer = "";
+
+// 입력 감지
+t.addEventListener("input", () => {
+  buffer = t.value.replace(/[^a-zA-Z]/g, "").toLowerCase();
+  t.value = Hangul.assemble(buffer.split(''));
+});
+
+// 복사 버튼
+function copy() {
+  t.select();
+  document.execCommand("copy");
+  alert("복사됨!");
+}
+</script>
+</body>
+</html>
