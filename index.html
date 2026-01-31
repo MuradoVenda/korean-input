@@ -1,69 +1,88 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>한글 입력기 (통합)</title>
-<style>
-body { font-family: system-ui, -apple-system, BlinkMacSystemFont; background: #f5f6f8; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;}
-.app { background: white; width: 360px; padding: 16px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.12);}
-h2 { text-align: center; margin-bottom: 12px;}
-textarea { width: 100%; height: 160px; font-size: 18px; padding: 12px; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box;}
-button { width: 100%; margin-top: 12px; padding: 12px; font-size: 16px; border-radius: 12px; border: none; background: #4f46e5; color: white; cursor: pointer;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영타-한글 변환기</title>
+    <style>
+        :root { --primary: #4f46e5; --bg: #f8fafc; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: white; width: 90%; max-width: 500px; padding: 2rem; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        h1 { font-size: 1.5rem; color: #1e293b; text-align: center; margin-bottom: 0.5rem; }
+        p { color: #64748b; text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        textarea { width: 100%; height: 200px; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1.2rem; resize: none; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        textarea:focus { border-color: var(--primary); }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
+        button { padding: 0.8rem; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
+        .btn-copy { background: var(--primary); color: white; }
+        .btn-reset { background: #e2e8f0; color: #475569; }
+        button:hover { opacity: 0.9; }
+    </style>
 </head>
 <body>
-<div class="app">
-  <h2>한글 입력기</h2>
-  <textarea id="t" placeholder="영문 입력 (예: dkssud)"></textarea>
-  <button onclick="copyText()">복사하기</button>
+
+<div class="container">
+    <h1>영문 자판 → 한글 변환</h1>
+    <p>영문 키보드 상태에서 그대로 타이핑하세요!</p>
+    <textarea id="input" placeholder="typing here..."></textarea>
+    <div class="btn-group">
+        <button class="btn-reset" onclick="resetText()">지우기</button>
+        <button class="btn-copy" onclick="copyText()">복사하기</button>
+    </div>
 </div>
 
+<script src="https://unpkg.com/hangul-js"></script>
 <script>
-/* Hangul.js 코드 전체를 여기에 붙여넣기 시작 */
-/* === 아래 코드를 그대로 복사해서 붙이면 됨 === */
-(function () {
-'use strict';
-var CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'],
-    JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ',['ㅗ','ㅏ'],['ㅗ','ㅐ'],['ㅗ','ㅣ'],'ㅛ','ㅜ',['ㅜ','ㅓ'],['ㅜ','ㅔ'],['ㅜ','ㅣ'],'ㅠ','ㅡ',['ㅡ','ㅣ'],'ㅣ'],
-    JONG = ['', 'ㄱ','ㄲ',['ㄱ','ㅅ'],'ㄴ',['ㄴ','ㅈ'],['ㄴ','ㅎ'],'ㄷ','ㄹ',['ㄹ','ㄱ'],['ㄹ','ㅁ'],['ㄹ','ㅂ'],['ㄹ','ㅅ'],['ㄹ','ㅌ'],['ㄹ','ㅍ'],['ㄹ','ㅎ'],'ㅁ','ㅂ',['ㅂ','ㅅ'],'ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'],
-    HANGUL_OFFSET = 0xAC00,
-    COMPLETE_CHO = CHO,
-    COMPLETE_JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'],
-    COMPLETE_JONG = JONG,
-    COMPLEX_CONSONANTS = [['ㄱ','ㅅ','ㄳ'],['ㄴ','ㅈ','ㄵ'],['ㄴ','ㅎ','ㄶ'],['ㄹ','ㄱ','ㄺ'],['ㄹ','ㅁ','ㄻ'],['ㄹ','ㅂ','ㄼ'],['ㄹ','ㅅ','ㄽ'],['ㄹ','ㅌ','ㄾ'],['ㄹ','ㅍ','ㄿ'],['ㄹ','ㅎ','ㅀ'],['ㅂ','ㅅ','ㅄ']],
-    COMPLEX_VOWELS = [['ㅗ','ㅏ','ㅘ'],['ㅗ','ㅐ','ㅙ'],['ㅗ','ㅣ','ㅚ'],['ㅜ','ㅓ','ㅝ'],['ㅜ','ㅔ','ㅞ'],['ㅜ','ㅣ','ㅟ'],['ㅡ','ㅣ','ㅢ']];
+    const inputArea = document.getElementById('input');
+    let charList = []; // 입력된 자모를 보관하는 곳
 
-function _makeHash(array){var hash={0:0};for(var i=0;i<array.length;i++){if(array[i]) hash[array[i].charCodeAt(0)]=i;} return hash;}
-function _makeComplexHash(array){var hash={};for(var i=0;i<array.length;i++){var code1=array[i][0].charCodeAt(0),code2=array[i][1].charCodeAt(0);if(typeof hash[code1]==='undefined'){hash[code1]={};}hash[code1][code2]=array[i][2].charCodeAt(0);} return hash;}
-var CHO_HASH=_makeHash(COMPLETE_CHO),JUNG_HASH=_makeHash(COMPLETE_JUNG),JONG_HASH=_makeHash(COMPLETE_JONG),COMPLEX_CONSONANTS_HASH=_makeComplexHash(COMPLEX_CONSONANTS),COMPLEX_VOWELS_HASH=_makeComplexHash(COMPLEX_VOWELS);
+    // 영문-한글 매핑표
+    const map = {
+        'q':'ㅂ','Q':'ㅃ','w':'ㅈ','W':'ㅉ','e':'ㄷ','E':'ㄸ','r':'ㄱ','R':'ㄲ','t':'ㅅ','T':'ㅆ',
+        'y':'ㅛ','u':'ㅕ','i':'ㅑ','o':'ㅐ','O':'ㅒ','p':'ㅔ','P':'ㅖ','a':'ㅁ','s':'ㄴ','d':'ㅇ',
+        'f':'ㄹ','g':'ㅎ','h':'ㅗ','j':'ㅓ','k':'ㅏ','l':'ㅣ','z':'ㅋ','x':'ㅌ','c':'ㅊ','v':'ㅍ',
+        'b':'ㅠ','n':'ㅜ','m':'ㅡ'
+    };
 
-function _isHangul(c){return 0xAC00<=c && c<=0xD7A3;}
-function _isCho(c){return typeof CHO_HASH[c]!=='undefined';}
-function _isJung(c){return typeof JUNG_HASH[c]!=='undefined';}
-function _isJong(c){return typeof JONG_HASH[c]!=='undefined';}
-function _isJungJoinable(a,b){return COMPLEX_VOWELS_HASH[a]&&COMPLEX_VOWELS_HASH[a][b]?COMPLEX_VOWELS_HASH[a][b]:false;}
-function _isJongJoinable(a,b){return COMPLEX_CONSONANTS_HASH[a]&&COMPLEX_CONSONANTS_HASH[a][b]?COMPLEX_CONSONANTS_HASH[a][b]:false;}
+    inputArea.addEventListener('keydown', (e) => {
+        // 1. 백스페이스 처리: 마지막 입력 자모 하나 제거
+        if (e.key === 'Backspace') {
+            e.preventDefault();
+            charList.pop();
+            render();
+            return;
+        }
 
-var Hangul={assemble:function(arr){if(typeof arr==='string') arr=arr.split('');var result='';for(var i=0;i<arr.length;i++){result+=arr[i];}return result;}}; // 최소 assemble만 구현
-window.Hangul=Hangul;
-})();
+        // 2. 엔터, 스페이스바 처리
+        if (e.key === 'Enter') { charList.push('\n'); render(); e.preventDefault(); return; }
+        if (e.key === ' ') { charList.push(' '); render(); e.preventDefault(); return; }
+
+        // 3. 한글 변환 처리
+        const kor = map[e.key];
+        if (kor) {
+            e.preventDefault();
+            charList.push(kor);
+            render();
+        }
+    });
+
+    // 화면에 글자를 합쳐서 보여주는 함수
+    function render() {
+        inputArea.value = Hangul.assemble(charList);
+        inputArea.scrollTop = inputArea.scrollHeight;
+    }
+
+    function resetText() {
+        charList = [];
+        inputArea.value = '';
+        inputArea.focus();
+    }
+
+    function copyText() {
+        navigator.clipboard.writeText(inputArea.value);
+        alert('복사되었습니다!');
+    }
 </script>
 
-<script>
-// 입력 처리
-const t = document.getElementById("t");
-t.addEventListener("input", () => {
-  let input = t.value.replace(/[^a-zA-Z]/g, "").toLowerCase();
-  t.value = Hangul.assemble(input.split(''));
-});
-
-// 복사 버튼
-function copyText() {
-  t.select();
-  document.execCommand("copy");
-  alert("복사됨!");
-}
-</script>
 </body>
 </html>
