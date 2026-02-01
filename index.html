@@ -3,76 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quick Hangul - 실시간 영타-한글 변환</title>
+    <title>Quick Hangul - 해외용 실시간 한글 변환기</title>
     <style>
         :root { --primary: #4f46e5; --bg: #f8fafc; }
         body { 
-            font-family: 'Pretendard', sans-serif; background: var(--bg); 
-            display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; margin: 0; padding: 20px 0;
+            font-family: 'Pretendard', -apple-system, sans-serif; 
+            background: var(--bg); display: flex; justify-content: center; 
+            align-items: center; min-height: 100vh; margin: 0; padding: 20px 0;
         }
         .container { 
-            background: white; width: 90%; max-width: 500px; padding: 2rem; 
-            border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
+            background: white; width: 90%; max-width: 500px; padding: 2.5rem; 
+            border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
         }
-        h1 { font-size: 1.5rem; color: #1e293b; text-align: center; margin-bottom: 0.5rem; }
-        p.subtitle { color: #64748b; text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        h1 { font-size: 1.6rem; color: #1e293b; text-align: center; margin-bottom: 0.5rem; }
+        .subtitle { color: #64748b; text-align: center; margin-bottom: 1.5rem; font-size: 0.95rem; }
         textarea { 
             width: 100%; height: 200px; padding: 1.2rem; border: 2px solid #e2e8f0; 
-            border-radius: 12px; font-size: 1.2rem; resize: none; box-sizing: border-box; 
-            outline: none; transition: all 0.2s; 
+            border-radius: 16px; font-size: 1.2rem; resize: none; box-sizing: border-box; 
+            outline: none; transition: all 0.2s; background: #fff;
         }
-        textarea:focus { border-color: var(--primary); }
+        textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.2rem; }
-        button { padding: 0.9rem; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button { 
+            padding: 1rem; border: none; border-radius: 12px; 
+            font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 1rem;
+        }
         .btn-copy { background: var(--primary); color: white; }
-        .btn-reset { background: #e2e8f0; color: #475569; }
-        button:hover { opacity: 0.9; }
-        .guide-box { margin-top: 30px; padding: 20px; border: 2px dashed #4f46e5; border-radius: 12px; background: #f0f0ff; text-align: center; }
-        .bookmarklet-btn { display: inline-block; padding: 10px 20px; background: #4f46e5; color: white; text-decoration: none; border-radius: 25px; font-weight: bold; margin: 10px 0; }
+        .btn-reset { background: #f1f5f9; color: #475569; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        .guide-box { margin-top: 30px; padding: 20px; border: 2px dashed #e2e8f0; border-radius: 16px; background: #fcfcfd; text-align: center; }
+        .bookmarklet-btn { display: inline-block; padding: 12px 24px; background: var(--primary); color: white; text-decoration: none; border-radius: 50px; font-weight: bold; margin: 10px 0; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Quick Hangul by JC</h1>
+    <h1>Quick Hangul <span style="font-size: 0.8rem; color: #94a3b8;">by JC</span></h1>
     <p class="subtitle">영문 자판 상태에서 그대로 타이핑하세요!</p>
     
-    <textarea id="input" placeholder="여기에 타이핑하세요..."></textarea>
+    <textarea id="input" placeholder="여기에 타이핑하세요..." spellcheck="false"></textarea>
     
     <div class="btn-group">
-        <button class="btn-reset" onclick="resetText()">지우기</button>
+        <button class="btn-reset" onclick="resetText()">초기화</button>
         <button class="btn-copy" onclick="copyText()">복사하기</button>
     </div>
 
     <div class="guide-box">
-        <p style="font-weight: bold; color: #4f46e5; margin: 0;">🚀 PC용 팝업 도구 등록</p>
-        <p style="font-size: 0.8rem; color: #666;">아래 버튼을 북마크바로 드래그하세요!</p>
-        <a class="bookmarklet-btn" href="javascript:(function(){const m={'q':'ㅂ','Q':'ㅃ','w':'ㅈ','W':'ㅉ','e':'ㄷ','E':'ㄸ','r':'ㄱ','R':'ㄲ','t':'ㅅ','T':'ㅆ','y':'ㅛ','u':'ㅕ','i':'ㅑ','o':'ㅐ','O':'ㅒ','p':'ㅔ','P':'ㅖ','a':'ㅁ','s':'ㄴ','d':'ㅇ','f':'ㄹ','g':'ㅎ','h':'ㅗ','j':'ㅓ','k':'ㅏ','l':'ㅣ','z':'ㅋ','x':'ㅌ','c':'ㅊ','v':'ㅍ','b':'ㅠ','n':'ㅜ','m':'ㅡ'};let b=[];const d=document.createElement('div');d.style.cssText='position:fixed;top:100px;right:100px;z-index:9999;background:#fff;padding:15px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.3);width:300px;border:2px solid #4f46e5;';d.innerHTML='<div style=&quot;display:flex;justify-content:space-between;margin-bottom:10px;&quot;><b style=&quot;color:#4f46e5&quot;>한글 입력기</b><span onclick=&quot;this.parentElement.parentElement.remove()&quot; style=&quot;cursor:pointer&quot;>✕</span></div><textarea id=&quot;xt&quot; style=&quot;width:100%;height:100px;font-size:16px;&quot;></textarea><button id=&quot;xb&quot; style=&quot;width:100%;margin-top:10px;padding:10px;background:#4f46e5;color:#fff;border:none;border-radius:5px;&quot;>복사</button>';document.body.appendChild(d);const t=document.getElementById('xt');t.focus();t.onkeydown=function(e){if(e.key==='Backspace'){e.preventDefault();b.pop();}else if(m[e.key]){e.preventDefault();b.push(m[e.key]);}else if(e.key===' '){e.preventDefault();b.push(' ');}else if(e.key==='Enter'){e.preventDefault();b.push('\n');}t.value=Hangul.assemble(b);};document.getElementById('xb').onclick=function(){navigator.clipboard.writeText(t.value);alert('복사됨');d.remove();};const s=document.createElement('script');s.src='https://unpkg.com/hangul-js';document.head.appendChild(s);})();">한글 팝업 도구</a>
+        <p style="margin: 0; font-weight: bold; color: var(--primary);">🚀 구글맵용 팝업 도구</p>
+        <p style="font-size: 0.8rem; color: #64748b;">아래 버튼을 북마크바로 드래그하세요.</p>
+        <a class="bookmarklet-btn" href="javascript:(function(){/* 고성능 북마클릿 엔진 */const m={'q':'ㅂ','Q':'ㅃ','w':'ㅈ','W':'ㅉ','e':'ㄷ','E':'ㄸ','r':'ㄱ','R':'ㄲ','t':'ㅅ','T':'ㅆ','y':'ㅛ','u':'ㅕ','i':'ㅑ','o':'ㅐ','O':'ㅒ','p':'ㅔ','P':'ㅖ','a':'ㅁ','s':'ㄴ','d':'ㅇ','f':'ㄹ','g':'ㅎ','h':'ㅗ','j':'ㅓ','k':'ㅏ','l':'ㅣ','z':'ㅋ','x':'ㅌ','c':'ㅊ','v':'ㅍ','b':'ㅠ','n':'ㅜ','m':'ㅡ'};const S_C=[0,1,3,6,7,8,16,17,18,20,21,22,23,24,25,26,27,28,29],S_J=[0,1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,20,22,27],S_B=[0,1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,19,20,21,22,23,24,25,26,27,28,29];const K_C='ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ',K_J='ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ',K_B=' ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ';function assem(chars){let res='',i=0;while(i<chars.length){let ci=K_C.indexOf(chars[i]),ni=K_J.indexOf(chars[i+1]);if(ci!==-1&&ni!==-1){let cho=S_C.indexOf(ci),jung=ni,jong=0;i+=2;let ti=K_B.indexOf(chars[i]),ui=K_J.indexOf(chars[i+1]);if(ti>0&&ui===-1){jong=S_B.indexOf(ti);i++;}res+=String.fromCharCode(44032+(cho*21+jung)*28+jong);}else{res+=chars[i];i++;}}return res;}let d=document.getElementById('hk-box');if(d)d.remove();d=document.createElement('div');d.id='hk-box';d.style.cssText='position:fixed;top:100px;right:100px;z-index:99999;background:#fff;padding:15px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.4);width:320px;border:1px solid #4f46e5;';d.innerHTML='<div style=&quot;display:flex;justify-content:space-between;margin-bottom:10px;font-weight:bold;color:#4f46e5&quot;><span>Quick Hangul</span><span onclick=&quot;this.parentElement.parentElement.remove()&quot; style=&quot;cursor:pointer&quot;>✕</span></div><textarea id=&quot;ht&quot; style=&quot;width:100%;height:100px;font-size:18px;padding:10px;box-sizing:border-box;&quot;></textarea><button id=&quot;hc&quot; style=&quot;width:100%;margin-top:10px;padding:10px;background:#4f46e5;color:#fff;border:none;border-radius:8px;cursor:pointer;&quot;>복사 후 닫기</button>';document.body.appendChild(d);const t=document.getElementById('ht');t.focus();let b=[];t.onkeydown=function(e){if(e.key==='Backspace'){e.preventDefault();b.pop();}else if(e.key===' '||e.key==='Enter'){e.preventDefault();b.push(e.key===' '?' ':'\n');}else{let k=m[e.key];if(k){e.preventDefault();b.push(k);}}t.value=assem(b);};document.getElementById('hc').onclick=function(){navigator.clipboard.writeText(t.value);alert('복사되었습니다!');d.remove();};})();">한글 팝업 도구</a>
     </div>
 </div>
 
-<script src="https://unpkg.com/hangul-js"></script>
 <script>
-    const m = {'q':'ㅂ','Q':'ㅃ','w':'ㅈ','W':'ㅉ','e':'ㄷ','E':'ㄸ','r':'ㄱ','R':'ㄲ','t':'ㅅ','T':'ㅆ','y':'ㅛ','u':'ㅕ','i':'ㅑ','o':'ㅐ','O':'ㅒ','p':'ㅔ','P':'ㅖ','a':'ㅁ','s':'ㄴ','d':'ㅇ','f':'ㄹ','g':'ㅎ','h':'ㅗ','j':'ㅓ','k':'ㅏ','l':'ㅣ','z':'ㅋ','x':'ㅌ','c':'ㅊ','v':'ㅍ','b':'ㅠ','n':'ㅜ','m':'ㅡ'};
+    const m={'q':'ㅂ','Q':'ㅃ','w':'ㅈ','W':'ㅉ','e':'ㄷ','E':'ㄸ','r':'ㄱ','R':'ㄲ','t':'ㅅ','T':'ㅆ','y':'ㅛ','u':'ㅕ','i':'ㅑ','o':'ㅐ','O':'ㅒ','p':'ㅔ','P':'ㅖ','a':'ㅁ','s':'ㄴ','d':'ㅇ','f':'ㄹ','g':'ㅎ','h':'ㅗ','j':'ㅓ','k':'ㅏ','l':'ㅣ','z':'ㅋ','x':'ㅌ','c':'ㅊ','v':'ㅍ','b':'ㅠ','n':'ㅜ','m':'ㅡ'};
+    const S_C=[0,1,3,6,7,8,16,17,18,20,21,22,23,24,25,26,27,28,29], S_J=[0,1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,20,22,27], S_B=[0,1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,19,20,21,22,23,24,25,26,27,28,29];
+    const K_C='ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ', K_J='ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ', K_B=' ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ';
+
     let charList = [];
     const inputArea = document.getElementById('input');
 
     inputArea.addEventListener('keydown', (e) => {
-        // 라이브러리가 로드되지 않았으면 실행 차단
-        if (typeof Hangul === 'undefined') return;
-
         if (e.key === 'Backspace') {
             e.preventDefault();
             charList.pop();
             render();
-        } else if (e.key === 'Enter') {
+        } else if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            charList.push('\n');
-            render();
-        } else if (e.key === ' ') {
-            e.preventDefault();
-            charList.push(' ');
+            charList.push(e.key === ' ' ? ' ' : '\n');
             render();
         } else {
             const kor = m[e.key];
@@ -84,26 +83,29 @@
         }
     });
 
+    function assem(chars){
+        let res='', i=0;
+        while(i<chars.length){
+            let ci=K_C.indexOf(chars[i]), ni=K_J.indexOf(chars[i+1]);
+            if(ci!==-1 && ni!==-1){
+                let cho=S_C.indexOf(ci), jung=ni, jong=0; i+=2;
+                let ti=K_B.indexOf(chars[i]), ui=K_J.indexOf(chars[i+1]);
+                if(ti>0 && ui===-1){ jong=S_B.indexOf(ti); i++; }
+                res+=String.fromCharCode(44032+(cho*21+jung)*28+jong);
+            } else { res+=chars[i]; i++; }
+        }
+        return res;
+    }
+
     function render() {
-        inputArea.value = Hangul.assemble(charList);
+        inputArea.value = assem(charList);
         inputArea.scrollTop = inputArea.scrollHeight;
     }
 
-    function resetText() {
-        charList = [];
-        inputArea.value = '';
-        inputArea.focus();
-    }
-
+    function resetText() { charList = []; inputArea.value = ''; inputArea.focus(); }
     function copyText() {
-        const val = inputArea.value;
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(val).then(() => alert('복사되었습니다!'));
-        } else {
-            inputArea.select();
-            document.execCommand('copy');
-            alert('복사되었습니다!');
-        }
+        const text = inputArea.value;
+        navigator.clipboard.writeText(text).then(() => alert('복사되었습니다!'));
     }
 </script>
 </body>
