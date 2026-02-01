@@ -43,29 +43,43 @@
     let isRendering = false;
 
     // 킨들 크롬의 모든 입력 시도를 감시
-    inputArea.addEventListener('input', (e) => {
-        if (isRendering) return; // 렌더링 중 발생하는 이벤트 무시
+ inputArea.addEventListener('input', (e) => {
+    if (isRendering) return;
 
-        const currentVal = inputArea.value;
+    const currentVal = inputArea.value;
+
+    // 1. 글자가 지워졌을 때
+    if (e.inputType === 'deleteContentBackward' || currentVal.length < lastVal.length) {
+        charList.pop();
+    } 
+    // 2. 글자가 추가됐을 때
+    else {
+        // e.data가 있으면 쓰고, 없으면 텍스트박스에서 직접 가져옴
+        let newChar = e.data || currentVal.charAt(currentVal.length - 1);
         
-        // 1. 글자가 지워졌을 때 (백스페이스)
-        if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
-            charList.pop();
-        } 
-        // 2. 글자가 추가됐을 때
-        else {
-            // e.data가 없는 킨들 크롬을 위해 실제 벨류 차이로 계산
-            const newChar = e.data || currentVal.slice(-1);
-            if (newChar === " " || e.inputType === "insertLineBreak") {
-                charList.push(newChar === " " ? " " : "\n");
-            } else {
-                const kor = m[newChar.toLowerCase()] || newChar;
-                charList.push(kor);
-            }
+        // [핵심 필터] 킨들이 보내는 이상한 제어 문자나 중복 입력을 걸러냄
+        if (newChar && newChar.length > 1) {
+            newChar = newChar.charAt(newChar.length - 1);
         }
-        render();
-    });
 
+        if (newChar === " " || newChar === "\n") {
+            charList.push(newChar);
+        } else if (newChar) {
+            const lowerChar = newChar.toLowerCase();
+            // 우리가 정한 자판(m)에 있는 영문이거나, 숫자/기호인 경우만 허용
+            if (m[lowerChar]) {
+                charList.push(m[lowerChar]);
+            } else if (/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(newChar)) {
+                // 한글 변환 대상은 아니지만 일반 기호/숫자라면 그대로 유지
+                charList.push(newChar);
+            }
+            // 그 외 킨들 시스템이 보내는 알 수 없는 문자는 무시(skip)
+        }
+    }
+
+    render();
+    lastVal = inputArea.value; // 상태 동기화
+});
     function assem(chars){
         let res='', i=0;
         while(i<chars.length){
@@ -96,3 +110,4 @@
 </script>
 </body>
 </html>
+
